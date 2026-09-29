@@ -1,18 +1,17 @@
-package com.yy.module.service;
+package com.example.mall.module.service;
 
+import java.math.BigDecimal;
 
-
-import com.yy.module.entity.Goods;
-import com.yy.module.mapper.GoodsMapper;
+import com.example.mall.module.entity.Goods;
+import com.example.mall.module.mapper.GoodsMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.List;
 
 /**
- * ClassName: StudentService
- * Package: com.example.demo.service
+ * ClassName: GoodsService
+ * Package: com.example.mall.module.service
  * Description:
  *
  * @Author
@@ -24,8 +23,8 @@ public class GoodsService {
     @Resource
     private GoodsMapper mapper;
 
-    public int createGoods(String title, Double price, String description, String images) {
-        Goods goods= new Goods();
+    public int createGoods(String title, BigDecimal price, String description, String images) {
+        Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         goods.setTitle(title);
         goods.setPrice(price);
@@ -36,8 +35,8 @@ public class GoodsService {
         return mapper.insert(goods);
     }
 
-    public int updateGoods(BigInteger goodsId, String title, Double price, String description, String images) {
-        Goods goods= new Goods();
+    public int updateGoods(Integer goodsId, String title, BigDecimal price, String description, String images) {
+        Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         goods.setId(goodsId);
         goods.setTitle(title);
@@ -48,13 +47,14 @@ public class GoodsService {
         return mapper.update(goods);
     }
 
-    public int deleteGoods(BigInteger goodsId) {
+    public int deleteGoods(Integer goodsId) {
         return mapper.delete(goodsId, (int) (System.currentTimeMillis() / 1000));
     }
 
-    public Goods getGoodsInfoById(BigInteger id) {
+    public Goods getGoodsInfoById(Integer id) {
         return mapper.getById(id);
     }
+
     public List<Goods> getAllGoods() {
         return mapper.getAll();
     }

@@ -1,14 +1,13 @@
-package com.yy.app.domain;
+package com.example.mall.app.domain;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * ClassName: GoodsListFeedVo
- * Package: com.yy.app.domain
+ * Package: com.example.mall.app.domain
  * Description:
  *
  * @Author

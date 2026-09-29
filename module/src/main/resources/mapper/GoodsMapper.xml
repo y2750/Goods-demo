@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace等于mapper接口类的全限定名 -->
-<mapper namespace="com.yy.module.mapper.GoodsMapper">
+<mapper namespace="com.example.mall.module.mapper.GoodsMapper">
 
     <insert id="insert">
         INSERT INTO goods (
@@ -36,5 +36,5 @@
         WHERE id = #{goods.id}
         AND is_deleted = 0
     </update>
- 
+
 </mapper>

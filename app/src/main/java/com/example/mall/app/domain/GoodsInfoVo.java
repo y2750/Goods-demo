@@ -1,14 +1,13 @@
-package com.yy.app.domain;
+package com.example.mall.app.domain;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
- * ClassName: GoodsVO
- * Package: com.yy.app.domain
+ * ClassName: GoodsInfoVo
+ * Package: com.example.mall.app.domain
  * Description:
  *
  * @Author
@@ -18,9 +17,9 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class GoodsInfoVo {
-    private BigInteger goodsId;
+    private Integer goodsId;
     private String title;
     private List<String> goodsImages;
-    private Double price;
+    private float price;
     private String description;
 }

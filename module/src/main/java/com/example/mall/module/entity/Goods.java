@@ -1,15 +1,15 @@
-package com.yy.module.entity;
+package com.example.mall.module.entity;
+
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.math.BigInteger;
-
 /**
- * ClassName: Student
- * Package: com.example.demo.entity
+ * ClassName: Goods
+ * Package: com.example.mall.module.entity
  * Description:
  *
  * @Author
@@ -21,10 +21,10 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class Goods {
-    private BigInteger id;
+    private Integer id;
     private String title;
     private String images;
-    private Double price;
+    private BigDecimal price;
     private String description;
     private Integer createTime;
     private Integer updateTime;

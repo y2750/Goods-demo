@@ -1,23 +1,23 @@
-package com.yy.app.controller;
+package com.example.mall.app.controller;
 
-import com.yy.app.domain.GoodsListFeedVo;
-import com.yy.app.domain.GoodsListVo;
-import com.yy.app.domain.GoodsInfoVo;
-import com.yy.module.entity.Goods;
-import com.yy.module.service.GoodsService;
+import com.example.mall.app.domain.GoodsListFeedVo;
+import com.example.mall.app.domain.GoodsListVo;
+import com.example.mall.app.domain.GoodsInfoVo;
+import com.example.mall.module.entity.Goods;
+import com.example.mall.module.service.GoodsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigInteger;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * ClassName: StudentController
- * Package: com.example.demo.controller
+ * ClassName: GoodsController
+ * Package: com.example.mall.app.controller
  * Description:
  *
  * @Author
@@ -26,16 +26,14 @@ import java.util.*;
  */
 @RestController
 public class GoodsController {
-
     @Autowired
     private GoodsService service;
 
     @RequestMapping("/goods/info")
-    public GoodsInfoVo goodsInfo(@RequestParam(name = "goodsId") BigInteger id) {
+    public GoodsInfoVo goodsInfo(@RequestParam(name = "goodsId") Integer id) {
         Goods goods = service.getGoodsInfoById(id);
         return getGoodsVO(goods);
     }
-
 
     @RequestMapping("/goods/list")
     public GoodsListFeedVo goodsList() {
@@ -49,10 +47,10 @@ public class GoodsController {
         return goodsListFeedVo;
     }
 
-
     private GoodsListVo getGoodsListVO(Goods goods) {
         GoodsListVo goodsListVO = new GoodsListVo();
-        BeanUtils.copyProperties(goods, goodsListVO);
+        BeanUtils.copyProperties(goods, goodsListVO, "price");
+        goodsListVO.setPrice(goods.getPrice().floatValue());
         goodsListVO.setMainImages(goods.getImages().split("\\$")[0]);
         goodsListVO.setGoodsId(goods.getId());
         return goodsListVO;
@@ -60,7 +58,8 @@ public class GoodsController {
 
     private static GoodsInfoVo getGoodsVO(Goods goods) {
         GoodsInfoVo goodsInfoVO = new GoodsInfoVo();
-        BeanUtils.copyProperties(goods, goodsInfoVO);
+        BeanUtils.copyProperties(goods, goodsInfoVO, "price");
+        goodsInfoVO.setPrice(goods.getPrice().floatValue());
         List<String> list = Arrays.asList(goods.getImages().split("\\$"));
         goodsInfoVO.setGoodsImages(list);
         goodsInfoVO.setGoodsId(goods.getId());
