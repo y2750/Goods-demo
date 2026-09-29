@@ -32,31 +32,6 @@ public class GoodsController {
     @RequestMapping("/goods/info")
     public GoodsInfoVo goodsInfo(@RequestParam(name = "goodsId") Integer id) {
         Goods goods = service.getGoodsInfoById(id);
-        return getGoodsVO(goods);
-    }
-
-    @RequestMapping("/goods/list")
-    public GoodsListFeedVo goodsList() {
-        List<Goods> goodsList = service.getAllGoods();
-        List<GoodsListVo> goodsListVOList = new ArrayList<>();
-        for (Goods goods : goodsList) {
-            goodsListVOList.add(getGoodsListVO(goods));
-        }
-        GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
-        goodsListFeedVo.setList(goodsListVOList);
-        return goodsListFeedVo;
-    }
-
-    private GoodsListVo getGoodsListVO(Goods goods) {
-        GoodsListVo goodsListVO = new GoodsListVo();
-        BeanUtils.copyProperties(goods, goodsListVO, "price");
-        goodsListVO.setPrice(goods.getPrice().floatValue());
-        goodsListVO.setMainImages(goods.getImages().split("\\$")[0]);
-        goodsListVO.setGoodsId(goods.getId());
-        return goodsListVO;
-    }
-
-    private static GoodsInfoVo getGoodsVO(Goods goods) {
         GoodsInfoVo goodsInfoVO = new GoodsInfoVo();
         BeanUtils.copyProperties(goods, goodsInfoVO, "price");
         goodsInfoVO.setPrice(goods.getPrice().floatValue());
@@ -64,5 +39,22 @@ public class GoodsController {
         goodsInfoVO.setGoodsImages(list);
         goodsInfoVO.setGoodsId(goods.getId());
         return goodsInfoVO;
+    }
+
+    @RequestMapping("/goods/list")
+    public GoodsListFeedVo goodsList() {
+        List<Goods> goodsList = service.getAllGoods();
+        List<GoodsListVo> goodsListVOList = new ArrayList<>();
+        for (Goods goods : goodsList) {
+            GoodsListVo goodsListVO = new GoodsListVo();
+            BeanUtils.copyProperties(goods, goodsListVO, "price");
+            goodsListVO.setPrice(goods.getPrice().floatValue());
+            goodsListVO.setMainImages(goods.getImages().split("\\$")[0]);
+            goodsListVO.setGoodsId(goods.getId());
+            goodsListVOList.add(goodsListVO);
+        }
+        GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
+        goodsListFeedVo.setList(goodsListVOList);
+        return goodsListFeedVo;
     }
 }
