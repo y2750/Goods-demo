@@ -22,13 +22,12 @@ public class GoodsController {
     private GoodsService service;
 
     @RequestMapping("/goods/create")
-    public String goodsCreate(
+    public Integer goodsCreate(
             @RequestParam(name = "title") String title,
             @RequestParam(name = "price") BigDecimal price,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "goodsImages") String images) {
-        int result = service.createGoods(title, price, description, images);
-        return 1 == result ? "成功" : "失败";
+        return service.createGoods(title, price, description, images);
     }
 
     @RequestMapping("/goods/update")

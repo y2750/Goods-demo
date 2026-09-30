@@ -5,34 +5,44 @@
 <!-- namespace等于mapper接口类的全限定名 -->
 <mapper namespace="com.example.mall.module.mapper.GoodsMapper">
 
-    <insert id="insert">
-        INSERT INTO goods (
-        title,
-        images,
-        price,
-        description,
-        create_time,
-        update_time,
+    <insert id="insert" useGeneratedKeys="true" keyProperty="goods.id">
+        INSERT INTO goods(
+        <if test="goods.title != null and goods.title != ''">title,</if>
+        <if test="goods.images != null and goods.images != ''">images,</if>
+        <if test="goods.price != null">price,</if>
+        <if test="goods.description != null and goods.description != ''">description,</if>
+        <if test="goods.createTime != null">create_time,</if>
+        <if test="goods.updateTime != null">update_time,</if>
         is_deleted
         )
-        VALUES (
-        #{goods.title},
-        #{goods.images},
-        #{goods.price},
-        #{goods.description},
-        #{goods.createTime},
-        #{goods.updateTime},
+        VALUES(
+        <if test="goods.title != null and goods.title != ''">#{goods.title},</if>
+        <if test="goods.images != null and goods.images != ''">#{goods.images},</if>
+        <if test="goods.price != null">#{goods.price},</if>
+        <if test="goods.description != null and goods.description != ''">#{goods.description},</if>
+        <if test="goods.createTime != null">#{goods.createTime},</if>
+        <if test="goods.updateTime != null">#{goods.updateTime},</if>
         0
         )
     </insert>
 
     <update id="update">
         UPDATE goods
-        SET title = #{goods.title},
-        images = #{goods.images},
-        price = #{goods.price},
-        description = #{goods.description,jdbcType=VARCHAR},
-        update_time = #{goods.updateTime}
+        <set>
+            <if test="goods.title != null and goods.title != ''">
+                title = #{goods.title},
+            </if>
+            <if test="goods.images != null and goods.images != ''">
+                images = #{goods.images},
+            </if>
+            <if test="goods.price != null">
+                price = #{goods.price},
+            </if>
+            <if test="goods.description != null and goods.description != ''">
+                description = #{goods.description,jdbcType=VARCHAR},
+            </if>
+            update_time = #{goods.updateTime}
+        </set>
         WHERE id = #{goods.id}
         AND is_deleted = 0
     </update>

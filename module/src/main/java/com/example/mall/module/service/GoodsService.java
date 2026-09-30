@@ -23,7 +23,7 @@ public class GoodsService {
     @Resource
     private GoodsMapper mapper;
 
-    public int createGoods(String title, BigDecimal price, String description, String images) {
+    public Integer createGoods(String title, BigDecimal price, String description, String images) {
         Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         goods.setTitle(title);
@@ -32,7 +32,8 @@ public class GoodsService {
         goods.setImages(images);
         goods.setCreateTime(timestamp);
         goods.setUpdateTime(timestamp);
-        return mapper.insert(goods);
+        mapper.insert(goods);
+        return goods.getId();
     }
 
     public int updateGoods(Integer goodsId, String title, BigDecimal price, String description, String images) {

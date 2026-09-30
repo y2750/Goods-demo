@@ -27,7 +27,7 @@ public interface GoodsMapper {
 
     int update(@Param("goods") Goods goods);
 
-    int insert(@Param("goods") Goods goods);
+    Integer insert(@Param("goods") Goods goods);
 
     @Update("update goods set is_deleted=1, update_time=#{time} where id=#{id} limit 1")
     int delete(@Param("id") Integer id, @Param("time") Integer time);
