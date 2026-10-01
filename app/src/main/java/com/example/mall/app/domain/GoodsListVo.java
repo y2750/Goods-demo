@@ -18,5 +18,5 @@ public class GoodsListVo {
     private Integer goodsId;
     private String title;
     private String mainImages;
-    private float price;
+    private Float price;
 }

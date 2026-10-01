@@ -20,6 +20,6 @@ public class GoodsInfoVo {
     private Integer goodsId;
     private String title;
     private List<String> goodsImages;
-    private float price;
+    private Float price;
     private String description;
 }
