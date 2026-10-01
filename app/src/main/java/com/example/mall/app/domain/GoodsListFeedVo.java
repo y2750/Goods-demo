@@ -18,4 +18,5 @@ import java.util.List;
 @Accessors(chain = true)
 public class GoodsListFeedVo {
     private List<GoodsListVo> list;
+    private Boolean isEnd;
 }

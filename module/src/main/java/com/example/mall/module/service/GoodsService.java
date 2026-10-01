@@ -23,6 +23,8 @@ public class GoodsService {
     @Resource
     private GoodsMapper mapper;
 
+    public static final int PAGE_SIZE = 10;
+
     public Integer createGoods(String title, BigDecimal price, String description, String images) {
         Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
@@ -58,5 +60,14 @@ public class GoodsService {
 
     public List<Goods> getAllGoods() {
         return mapper.getAll();
+    }
+
+    public List<Goods> getGoodsByPage(Integer page) {
+        int offset = (page - 1) * PAGE_SIZE;
+        return mapper.getGoodsByPage(offset, PAGE_SIZE);
+    }
+
+    public Integer getTotal() {
+        return mapper.getTotal();
     }
 }

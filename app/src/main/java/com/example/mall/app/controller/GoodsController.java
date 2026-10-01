@@ -42,8 +42,8 @@ public class GoodsController {
     }
 
     @RequestMapping("/goods/list")
-    public GoodsListFeedVo goodsList() {
-        List<Goods> goodsList = service.getAllGoods();
+    public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page) {
+        List<Goods> goodsList = service.getGoodsByPage(page);
         List<GoodsListVo> goodsListVOList = new ArrayList<>();
         for (Goods goods : goodsList) {
             GoodsListVo goodsListVO = new GoodsListVo();
@@ -55,6 +55,7 @@ public class GoodsController {
         }
         GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
         goodsListFeedVo.setList(goodsListVOList);
+        goodsListFeedVo.setIsEnd(!(goodsList.size() == 10));
         return goodsListFeedVo;
     }
 }

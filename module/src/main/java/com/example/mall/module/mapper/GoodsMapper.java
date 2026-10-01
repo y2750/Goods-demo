@@ -31,4 +31,9 @@ public interface GoodsMapper {
 
     @Update("update goods set is_deleted=1, update_time=#{time} where id=#{id} limit 1")
     int delete(@Param("id") Integer id, @Param("time") Integer time);
+
+    List<Goods> getGoodsByPage(@Param("offset") int offset,@Param("pageSize") int pageSize);
+
+    @Select("select count(*) from goods where is_deleted = 0")
+    Integer getTotal();
 }
