@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.mall.module.service.GoodsService.PAGE_SIZE;
+
 /**
  * ClassName: GoodsController
  * Package: com.example.mall.app.controller
@@ -55,7 +57,7 @@ public class GoodsController {
         }
         GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
         goodsListFeedVo.setList(goodsListVOList);
-        goodsListFeedVo.setIsEnd(!(goodsList.size() == 10));
+        goodsListFeedVo.setIsEnd(!(goodsList.size() == PAGE_SIZE));
         return goodsListFeedVo;
     }
 }
