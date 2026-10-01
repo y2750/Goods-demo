@@ -25,7 +25,7 @@ public class GoodsService {
 
     public static final int PAGE_SIZE = 10;
 
-    public Integer createGoods(String title, BigDecimal price, String description, String images) {
+    public Integer createGoods(String title, Float price, String description, String images) {
         Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         goods.setTitle(title);
@@ -38,7 +38,7 @@ public class GoodsService {
         return goods.getId();
     }
 
-    public int updateGoods(Integer goodsId, String title, BigDecimal price, String description, String images) {
+    public int updateGoods(Integer goodsId, String title, Float price, String description, String images) {
         Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         goods.setId(goodsId);

@@ -24,7 +24,7 @@ public class Goods {
     private Integer id;
     private String title;
     private String images;
-    private BigDecimal price;
+    private Float price;
     private String description;
     private Integer createTime;
     private Integer updateTime;

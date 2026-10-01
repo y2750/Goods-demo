@@ -38,7 +38,7 @@ public class GoodsController {
     @RequestMapping("/goods/create")
     public Integer goodsCreate(
             @RequestParam(name = "title") String title,
-            @RequestParam(name = "price") BigDecimal price,
+            @RequestParam(name = "price") Float price,
             @RequestParam(name = "description") String description,
             @RequestParam(name = "goodsImages") String images) {
         return service.createGoods(title, price, description, images);
@@ -47,7 +47,7 @@ public class GoodsController {
     @RequestMapping("/goods/update")
     public String goodsUpdate(@RequestParam(name = "goodsId") Integer goodsId,
                               @RequestParam(name = "title") String title,
-                              @RequestParam(name = "price") BigDecimal price,
+                              @RequestParam(name = "price") Float price,
                               @RequestParam(name = "description") String description,
                               @RequestParam(name = "images") String images) {
         int result = service.updateGoods(goodsId, title, price, description, images);

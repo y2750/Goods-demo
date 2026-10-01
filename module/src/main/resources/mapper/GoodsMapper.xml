@@ -46,8 +46,9 @@
         WHERE id = #{goods.id}
         AND is_deleted = 0
     </update>
+
     <select id="getGoodsByPage" resultType="com.example.mall.module.entity.Goods">
-        SELECT * FROM goods WHERE is_deleted = 0 order by id
+        SELECT * FROM goods WHERE is_deleted = 0 ORDER BY id
         LIMIT #{offset}, #{pageSize}
     </select>
 
