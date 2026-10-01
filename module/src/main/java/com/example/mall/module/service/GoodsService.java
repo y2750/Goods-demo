@@ -58,10 +58,6 @@ public class GoodsService {
         return mapper.getById(id);
     }
 
-    public List<Goods> getAllGoods() {
-        return mapper.getAll();
-    }
-
     public List<Goods> getGoodsByPage(Integer page) {
         int offset = (page - 1) * PAGE_SIZE;
         return mapper.getGoodsByPage(offset, PAGE_SIZE);
