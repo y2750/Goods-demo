@@ -49,8 +49,8 @@ public class GoodsController {
                               @RequestParam(name = "title") String title,
                               @RequestParam(name = "price") Float price,
                               @RequestParam(name = "description") String description,
-                              @RequestParam(name = "images") String images) {
-        int result = service.updateGoods(goodsId, title, price, description, images);
+                              @RequestParam(name = "goodsImages") String goodsImages) {
+        int result = service.updateGoods(goodsId, title, price, description, goodsImages);
         return 1 == result ? "成功" : "失败";
     }
 
@@ -86,7 +86,7 @@ public class GoodsController {
             GoodsListVo goodsListVO = new GoodsListVo();
             BeanUtils.copyProperties(goods, goodsListVO, "price");
             goodsListVO.setPrice(goods.getPrice().floatValue());
-            goodsListVO.setMainImages(goods.getImages().split("\\$")[0]);
+            goodsListVO.setMainImage(goods.getImages().split("\\$")[0]);
             goodsListVO.setGoodsId(goods.getId());
             goodsListVOList.add(goodsListVO);
         }

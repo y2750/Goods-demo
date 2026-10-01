@@ -53,7 +53,7 @@ public class GoodsController {
             GoodsListVo goodsListVO = new GoodsListVo();
             BeanUtils.copyProperties(goods, goodsListVO, "price");
             goodsListVO.setPrice(goods.getPrice().floatValue());
-            goodsListVO.setMainImages(goods.getImages().split("\\$")[0]);
+            goodsListVO.setMainImage(goods.getImages().split("\\$")[0]);
             goodsListVO.setGoodsId(goods.getId());
             goodsListVOList.add(goodsListVO);
         }
