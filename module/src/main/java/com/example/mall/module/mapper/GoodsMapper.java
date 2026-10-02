@@ -25,14 +25,14 @@ public interface GoodsMapper {
     @Select("select * from goods where is_deleted = 0")
     List<Goods> getAll();
 
-    int update(@Param("goods") Goods goods);
+    Integer update(@Param("goods") Goods goods);
 
     Integer insert(@Param("goods") Goods goods);
 
     @Update("update goods set is_deleted=1, update_time=#{time} where id=#{id} limit 1")
     int delete(@Param("id") Integer id, @Param("time") Integer time);
 
-    List<Goods> getGoodsByPage(@Param("offset") int offset,@Param("pageSize") int pageSize);
+    List<Goods> getGoodsByPage(@Param("offset") int offset,@Param("pageSize") int pageSize,@Param("keyword") String keyword);
 
     @Select("select count(*) from goods where is_deleted = 0")
     Integer getTotal();

@@ -1,6 +1,5 @@
 package com.example.mall.console.controller;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -11,10 +10,14 @@ import java.util.List;
 import com.example.mall.console.domain.GoodsInfoVo;
 import com.example.mall.console.domain.GoodsListFeedVo;
 import com.example.mall.console.domain.GoodsListVo;
+import com.example.mall.console.dto.GoodsCreateDto;
+import com.example.mall.console.dto.GoodsUpdateDto;
 import com.example.mall.module.entity.Goods;
 import com.example.mall.module.service.GoodsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,22 +39,23 @@ public class GoodsController {
     private GoodsService service;
 
     @RequestMapping("/goods/create")
-    public Integer goodsCreate(
-            @RequestParam(name = "title") String title,
-            @RequestParam(name = "price") Float price,
-            @RequestParam(name = "description") String description,
-            @RequestParam(name = "goodsImages") String images) {
-        return service.createGoods(title, price, description, images);
+    public Integer goodsCreate(@RequestBody GoodsCreateDto goodsCreateDto) {
+        if (!StringUtils.hasText(goodsCreateDto.getTitle()) || goodsCreateDto.getPrice() == null) {
+            throw new RuntimeException("Parameter error");
+        }
+        goodsCreateDto.setTitle(goodsCreateDto.getTitle().trim());
+        return service.editGoods(null, goodsCreateDto.getTitle(), goodsCreateDto.getPrice(),
+                goodsCreateDto.getDescription(), goodsCreateDto.getImages());
     }
 
     @RequestMapping("/goods/update")
-    public String goodsUpdate(@RequestParam(name = "goodsId") Integer goodsId,
-                              @RequestParam(name = "title") String title,
-                              @RequestParam(name = "price") Float price,
-                              @RequestParam(name = "description") String description,
-                              @RequestParam(name = "goodsImages") String goodsImages) {
-        int result = service.updateGoods(goodsId, title, price, description, goodsImages);
-        return 1 == result ? "成功" : "失败";
+    public Integer goodsUpdate(@RequestBody GoodsUpdateDto goodsUpdateDto) {
+        if (!StringUtils.hasText(goodsUpdateDto.getTitle()) || goodsUpdateDto.getPrice() == null || goodsUpdateDto.getGoodsId() == null) {
+            throw new RuntimeException("Parameter error");
+        }
+        goodsUpdateDto.setTitle(goodsUpdateDto.getTitle().trim());
+        return service.editGoods(goodsUpdateDto.getGoodsId(), goodsUpdateDto.getTitle(), goodsUpdateDto.getPrice(),
+                goodsUpdateDto.getDescription(), goodsUpdateDto.getGoodsImages());
     }
 
     @RequestMapping("/goods/delete")
@@ -79,8 +83,8 @@ public class GoodsController {
     }
 
     @RequestMapping("/goods/list")
-    public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page) {
-        List<Goods> goodsList = service.getGoodsByPage(page);
+    public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page, @RequestParam(name = "keyword", required = false) String keyword) {
+        List<Goods> goodsList = service.getGoodsByPage(page, keyword);
         List<GoodsListVo> goodsListVOList = new ArrayList<>();
         for (Goods goods : goodsList) {
             GoodsListVo goodsListVO = new GoodsListVo();
