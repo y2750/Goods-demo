@@ -79,8 +79,8 @@ public class GoodsController {
     }
 
     @RequestMapping("/goods/list")
-    public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page) {
-        List<Goods> goodsList = service.getGoodsByPage(page);
+    public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page, @RequestParam(name = "keyword", required = false) String keyword) {
+        List<Goods> goodsList = service.getGoodsByPage(page, keyword);
         List<GoodsListVo> goodsListVOList = new ArrayList<>();
         for (Goods goods : goodsList) {
             GoodsListVo goodsListVO = new GoodsListVo();
