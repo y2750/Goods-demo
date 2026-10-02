@@ -15,6 +15,7 @@ import com.example.mall.module.entity.Goods;
 import com.example.mall.module.service.GoodsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,21 +38,29 @@ public class GoodsController {
 
     @RequestMapping("/goods/create")
     public Integer goodsCreate(
-            @RequestParam(name = "title") String title,
-            @RequestParam(name = "price") Float price,
-            @RequestParam(name = "description") String description,
-            @RequestParam(name = "goodsImages") String images) {
-        return service.createGoods(title, price, description, images);
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "price", required = false) Float price,
+            @RequestParam(name = "description", required = false) String description,
+            @RequestParam(name = "images", required = false) String images) {
+        if (!StringUtils.hasText(title) || price == null) {
+            throw new RuntimeException("Parameter error");
+        }
+        title = title.trim();
+        return service.editGoods(null, title, price, description, images);
     }
 
     @RequestMapping("/goods/update")
-    public String goodsUpdate(@RequestParam(name = "goodsId") Integer goodsId,
-                              @RequestParam(name = "title") String title,
-                              @RequestParam(name = "price") Float price,
-                              @RequestParam(name = "description") String description,
-                              @RequestParam(name = "goodsImages") String goodsImages) {
-        int result = service.updateGoods(goodsId, title, price, description, goodsImages);
-        return 1 == result ? "成功" : "失败";
+    public Integer goodsUpdate(
+            @RequestParam(name = "goodsId", required = false) Integer goodsId,
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "price", required = false) Float price,
+            @RequestParam(name = "description", required = false) String description,
+            @RequestParam(name = "goodsImages", required = false) String goodsImages) {
+        if (!StringUtils.hasText(title) || price == null || goodsId == null) {
+            throw new RuntimeException("Parameter error");
+        }
+        title = title.trim();
+        return service.editGoods(goodsId, title, price, description, goodsImages);
     }
 
     @RequestMapping("/goods/delete")
