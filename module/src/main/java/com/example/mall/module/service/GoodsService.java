@@ -67,7 +67,7 @@ public class GoodsService {
             }
             return goods.getId();
         } else {
-            Goods byId = mapper.getById(goods.getId());
+            Goods byId = mapper.getByIdNotCheckIsDeleted(goods.getId());
             if (byId == null) {
                 throw new RuntimeException("Goods ID does not exist.");
             }

@@ -35,4 +35,7 @@ public interface GoodsMapper {
     List<Goods> getGoodsByPage(@Param("offset") int offset,@Param("pageSize") int pageSize,@Param("keyword") String keyword);
 
     Integer getTotal(@Param("keyword") String keyword);
+
+    @Select("select * from goods WHERE id=#{id}")
+    Goods getByIdNotCheckIsDeleted(Integer id);
 }
