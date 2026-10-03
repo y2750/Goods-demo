@@ -24,31 +24,6 @@ public class GoodsService {
 
     public static final int PAGE_SIZE = 10;
 
-    public Integer createGoods(String title, Float price, String description, String images) {
-        Goods goods = new Goods();
-        int timestamp = (int) (System.currentTimeMillis() / 1000);
-        goods.setTitle(title);
-        goods.setPrice(price);
-        goods.setDescription(description);
-        goods.setImages(images);
-        goods.setCreateTime(timestamp);
-        goods.setUpdateTime(timestamp);
-        mapper.insert(goods);
-        return goods.getId();
-    }
-
-    public int updateGoods(Integer goodsId, String title, Float price, String description, String images) {
-        Goods goods = new Goods();
-        int timestamp = (int) (System.currentTimeMillis() / 1000);
-        goods.setId(goodsId);
-        goods.setTitle(title);
-        goods.setPrice(price);
-        goods.setDescription(description);
-        goods.setImages(images);
-        goods.setUpdateTime(timestamp);
-        return mapper.update(goods);
-    }
-
     public Integer edit(Integer goodsId, String title, Float price, String description, String images) {
         Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
@@ -61,7 +36,7 @@ public class GoodsService {
         int result;
         if (goods.getId() == null) {
             goods.setCreateTime(timestamp);
-            result = mapper.insert(goods);
+            result = insert(goods);
             if (result == 0) {
                 throw new RuntimeException("Goods creation failed.");
             }
@@ -77,6 +52,10 @@ public class GoodsService {
             }
             return goods.getId();
         }
+    }
+
+    private Integer insert(Goods goods) {
+        return mapper.insert(goods);
     }
 
     public int deleteGoods(Integer goodsId) {
