@@ -37,5 +37,5 @@ public interface GoodsMapper {
     Integer getTotal(@Param("keyword") String keyword);
 
     @Select("select * from goods WHERE id=#{id}")
-    Goods getByIdNotCheckIsDeleted(Integer id);
+    Goods extractById(Integer id);
 }
