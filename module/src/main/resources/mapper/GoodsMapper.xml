@@ -59,4 +59,14 @@
         LIMIT #{offset}, #{pageSize}
     </select>
 
+    <select id="getTotal" resultType="java.lang.Integer">
+        SELECT count(*) FROM goods
+        <where>
+            is_deleted = 0
+            <if test="keyword != null and keyword != ''">
+                AND title LIKE #{keyword}
+            </if>
+        </where>
+    </select>
+
 </mapper>

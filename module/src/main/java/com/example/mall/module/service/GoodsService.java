@@ -1,7 +1,5 @@
 package com.example.mall.module.service;
 
-import java.math.BigDecimal;
-
 import com.example.mall.module.entity.Goods;
 import com.example.mall.module.mapper.GoodsMapper;
 import org.springframework.stereotype.Service;
@@ -51,7 +49,7 @@ public class GoodsService {
         return mapper.update(goods);
     }
 
-    public Integer editGoods(Integer goodsId, String title, Float price, String description, String images) {
+    public Integer edit(Integer goodsId, String title, Float price, String description, String images) {
         Goods goods = new Goods();
         int timestamp = (int) (System.currentTimeMillis() / 1000);
         goods.setId(goodsId);
@@ -91,13 +89,17 @@ public class GoodsService {
 
     public List<Goods> getGoodsByPage(Integer page,String keyword) {
         int offset = (page - 1) * PAGE_SIZE;
-        if (StringUtils.hasText(keyword)) {
-            keyword = "%" + keyword.trim() + "%";
-        }
-        return mapper.getGoodsByPage(offset, PAGE_SIZE,keyword);
+        return mapper.getGoodsByPage(offset, PAGE_SIZE, toTitlePattern(keyword));
     }
 
-    public Integer getTotal() {
-        return mapper.getTotal();
+    public Integer getTotal(String keyword) {
+        return mapper.getTotal(toTitlePattern(keyword));
+    }
+
+    private String toTitlePattern(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return null;
+        }
+        return "%" + keyword.trim() + "%";
     }
 }

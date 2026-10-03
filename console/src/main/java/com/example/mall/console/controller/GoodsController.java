@@ -1,12 +1,14 @@
 package com.example.mall.console.controller;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.example.mall.console.domain.GoodsInfoVo;
 import com.example.mall.console.domain.GoodsListFeedVo;
@@ -15,10 +17,12 @@ import com.example.mall.module.entity.Goods;
 import com.example.mall.module.service.GoodsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import static com.example.mall.module.service.GoodsService.PAGE_SIZE;
 
@@ -36,17 +40,30 @@ public class GoodsController {
     @Autowired
     private GoodsService service;
 
+    @Autowired
+    @Qualifier("handlerExceptionResolver")
+    private HandlerExceptionResolver exceptionResolver;
+
     @RequestMapping("/goods/create")
     public Integer goodsCreate(
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "price", required = false) Float price,
             @RequestParam(name = "description", required = false) String description,
-            @RequestParam(name = "images", required = false) String images) {
+            @RequestParam(name = "images", required = false) String images,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         if (!StringUtils.hasText(title) || price == null) {
-            throw new RuntimeException("Parameter error");
+            exceptionResolver.resolveException(request, response, null,
+                    new IllegalArgumentException("Parameter error"));
+            return null;
         }
         title = title.trim();
-        return service.editGoods(null, title, price, description, images);
+        try {
+            return service.edit(null, title, price, description, images);
+        } catch (Exception e) {
+            exceptionResolver.resolveException(request, response, null, e);
+            return null;
+        }
     }
 
     @RequestMapping("/goods/update")
@@ -55,12 +72,21 @@ public class GoodsController {
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "price", required = false) Float price,
             @RequestParam(name = "description", required = false) String description,
-            @RequestParam(name = "goodsImages", required = false) String goodsImages) {
+            @RequestParam(name = "goodsImages", required = false) String goodsImages,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         if (!StringUtils.hasText(title) || price == null || goodsId == null) {
-            throw new RuntimeException("Parameter error");
+            exceptionResolver.resolveException(request, response, null,
+                    new IllegalArgumentException("Parameter error"));
+            return null;
         }
         title = title.trim();
-        return service.editGoods(goodsId, title, price, description, goodsImages);
+        try {
+            return service.edit(goodsId, title, price, description, goodsImages);
+        } catch (Exception e) {
+            exceptionResolver.resolveException(request, response, null, e);
+            return null;
+        }
     }
 
     @RequestMapping("/goods/delete")
@@ -101,7 +127,7 @@ public class GoodsController {
         }
         GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
         goodsListFeedVo.setList(goodsListVOList);
-        goodsListFeedVo.setTotal(service.getTotal());
+        goodsListFeedVo.setTotal(service.getTotal(keyword));
         goodsListFeedVo.setPageSize(PAGE_SIZE);
         return goodsListFeedVo;
     }

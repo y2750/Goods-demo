@@ -23,6 +23,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         log.error("请求处理发生未捕获异常", e);
-        return ResponseEntity.status(500).body("⽹络繁忙");
+        return ResponseEntity.status(500).body("网络繁忙");
     }
 }
