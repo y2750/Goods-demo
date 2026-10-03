@@ -1,12 +1,13 @@
 package com.example.mall.module.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.mall.module.entity.Goods;
 import com.example.mall.module.mapper.GoodsMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * ClassName: GoodsService
@@ -42,11 +43,7 @@ public class GoodsService {
             }
             return goods.getId();
         } else {
-            Goods byId = mapper.extractById(goods.getId());
-            if (byId == null) {
-                throw new RuntimeException("Goods ID does not exist.");
-            }
-            result = mapper.update(goods);
+            result = mapper.updateById(goods);
             if (result == 0) {
                 throw new RuntimeException("Goods update failed.");
             }
@@ -59,26 +56,22 @@ public class GoodsService {
     }
 
     public int deleteGoods(Integer goodsId) {
-        return mapper.delete(goodsId, (int) (System.currentTimeMillis() / 1000));
+        return mapper.deleteById(goodsId);
     }
 
     public Goods getGoodsInfoById(Integer id) {
-        return mapper.getById(id);
+        return mapper.selectById(id);
     }
 
-    public List<Goods> getGoodsByPage(Integer page,String keyword) {
-        int offset = (page - 1) * PAGE_SIZE;
-        return mapper.getGoodsByPage(offset, PAGE_SIZE, toTitlePattern(keyword));
-    }
+    public Page<Goods> getGoodsByPage(Integer pageNo, String keyword) {
 
-    public Integer getTotal(String keyword) {
-        return mapper.getTotal(toTitlePattern(keyword));
-    }
-
-    private String toTitlePattern(String keyword) {
-        if (!StringUtils.hasText(keyword)) {
-            return null;
+        Page<Goods> page = new Page<>(pageNo, PAGE_SIZE);
+        LambdaQueryWrapper<Goods> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.hasText(keyword)) {
+            wrapper.like(Goods::getTitle, keyword.trim());
         }
-        return "%" + keyword.trim() + "%";
+        wrapper.orderByAsc(Goods::getId);
+        Page<Goods> result = mapper.selectPage(page, wrapper);
+        return result;
     }
 }

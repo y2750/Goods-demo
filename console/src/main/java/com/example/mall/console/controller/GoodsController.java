@@ -10,6 +10,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.mall.console.domain.GoodsInfoVo;
 import com.example.mall.console.domain.GoodsListFeedVo;
 import com.example.mall.console.domain.GoodsListVo;
@@ -115,7 +116,8 @@ public class GoodsController {
 
     @RequestMapping("/goods/list")
     public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page, @RequestParam(name = "keyword", required = false) String keyword) {
-        List<Goods> goodsList = service.getGoodsByPage(page, keyword);
+        Page<Goods> result = service.getGoodsByPage(page, keyword);
+        List<Goods> goodsList = result.getRecords();
         List<GoodsListVo> goodsListVOList = new ArrayList<>();
         for (Goods goods : goodsList) {
             GoodsListVo goodsListVO = new GoodsListVo();
@@ -127,7 +129,7 @@ public class GoodsController {
         }
         GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
         goodsListFeedVo.setList(goodsListVOList);
-        goodsListFeedVo.setTotal(service.getTotal(keyword));
+        goodsListFeedVo.setTotal(result.getTotal());
         goodsListFeedVo.setPageSize(PAGE_SIZE);
         return goodsListFeedVo;
     }

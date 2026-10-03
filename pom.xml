@@ -21,6 +21,7 @@
         <module>module</module>
         <module>app</module>
         <module>console</module>
+        <module>main</module>
     </modules>
 
     <properties>

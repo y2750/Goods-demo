@@ -18,6 +18,6 @@ import java.util.List;
 @Accessors(chain = true)
 public class GoodsListFeedVo {
     private List<GoodsListVo> list;
-    private Integer total;
+    private Long total;
     private Integer pageSize;
 }

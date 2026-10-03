@@ -1,5 +1,6 @@
 package com.example.mall.app.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.mall.app.domain.GoodsListFeedVo;
 import com.example.mall.app.domain.GoodsListVo;
 import com.example.mall.app.domain.GoodsInfoVo;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.example.mall.module.service.GoodsService.PAGE_SIZE;
+
 
 /**
  * ClassName: GoodsController
@@ -46,8 +48,9 @@ public class GoodsController {
     @RequestMapping("/goods/list")
     public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page, @RequestParam(name = "keyword", required = false) String keyword) {
         GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
-        List<Goods> goodsList = service.getGoodsByPage(page,keyword);
-        goodsListFeedVo.setIsEnd(!(goodsList.size() == PAGE_SIZE));
+        Page<Goods> result = service.getGoodsByPage(page, keyword);
+        List<Goods> goodsList = result.getRecords();
+        goodsListFeedVo.setIsEnd(!result.hasNext());
         List<GoodsListVo> goodsListVOList = new ArrayList<>();
         for (Goods goods : goodsList) {
             GoodsListVo goodsListVO = new GoodsListVo();

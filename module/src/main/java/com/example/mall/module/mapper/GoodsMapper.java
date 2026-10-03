@@ -1,12 +1,8 @@
 package com.example.mall.module.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.mall.module.entity.Goods;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-
-import java.util.List;
 
 /**
  * ClassName: GoodsMapper
@@ -18,24 +14,6 @@ import java.util.List;
  * @Version 1.0
  */
 @Mapper
-public interface GoodsMapper {
-    @Select("select * from goods WHERE id=#{id} and is_deleted = 0")
-    Goods getById(@Param("id") Integer id);
+public interface GoodsMapper extends BaseMapper<Goods> {
 
-    @Select("select * from goods where is_deleted = 0")
-    List<Goods> getAll();
-
-    Integer update(@Param("goods") Goods goods);
-
-    Integer insert(@Param("goods") Goods goods);
-
-    @Update("update goods set is_deleted=1, update_time=#{time} where id=#{id} limit 1")
-    int delete(@Param("id") Integer id, @Param("time") Integer time);
-
-    List<Goods> getGoodsByPage(@Param("offset") int offset,@Param("pageSize") int pageSize,@Param("keyword") String keyword);
-
-    Integer getTotal(@Param("keyword") String keyword);
-
-    @Select("select * from goods WHERE id=#{id}")
-    Goods extractById(Integer id);
 }
