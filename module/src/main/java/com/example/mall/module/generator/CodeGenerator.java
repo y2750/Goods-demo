@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -49,6 +49,15 @@ public class CodeGenerator {
             throw new IllegalArgumentException("tables 至少需要填写一张表，避免生成整个数据库");
         }
         Path outputRoot = projectRoot.resolve(required(settings, "output.root")).normalize();
+        boolean generateController = Boolean.parseBoolean(settings.getProperty("controller.enabled", "false"));
+        Map<OutputFile, String> outputPaths = new EnumMap<>(OutputFile.class);
+        outputPaths.put(OutputFile.xml, outputRoot.resolve("src/main/resources/mapper").toString());
+        if (generateController) {
+            String controllerPackage = required(settings, "controller.package");
+            Path controllerRoot = projectRoot.resolve(required(settings, "controller.output-root"));
+            outputPaths.put(OutputFile.controller, controllerRoot.resolve("src/main/java")
+                    .resolve(controllerPackage.replace('.', '/')).normalize().toString());
+        }
 
         FastAutoGenerator.create(url, username, password)
                 .globalConfig(builder -> builder
@@ -60,8 +69,7 @@ public class CodeGenerator {
                         .entity("entity")
                         .mapper("mapper")
                         .service("service")
-                        .pathInfo(Collections.singletonMap(OutputFile.xml,
-                                outputRoot.resolve("src/main/resources/mapper").toString())))
+                        .pathInfo(outputPaths))
                 .strategyConfig(builder -> {
                     builder.addInclude(tables);
                     builder.addTablePrefix(split(settings.getProperty("table.prefix", "")));
@@ -74,7 +82,13 @@ public class CodeGenerator {
                             .formatServiceFileName("%sService")
                             .serviceTemplate(TEMPLATE_ROOT + "service.java")
                             .disableServiceImpl();
-                    builder.controllerBuilder().disable();
+                    if (generateController) {
+                        builder.controllerBuilder()
+                                .formatFileName("%sController")
+                                .template(TEMPLATE_ROOT + "controller.java");
+                    } else {
+                        builder.controllerBuilder().disable();
+                    }
                 })
                 .injectionConfig(builder -> builder.beforeOutputFile(
                         (table, model) -> prepareModel(table, model, settings)))
@@ -82,6 +96,9 @@ public class CodeGenerator {
                 .execute();
 
         System.out.println("代码生成结束，输出目录：" + outputRoot);
+        if (generateController) {
+            System.out.println("Controller 输出目录：" + outputPaths.get(OutputFile.controller));
+        }
         System.out.println("已有文件默认跳过；请查看上面的逐文件生成日志。");
     }
 
@@ -120,6 +137,31 @@ public class CodeGenerator {
                 .map(f -> quote(f.getName()) + " AS " + quote(f.getPropertyName()))
                 .collect(Collectors.joining(", ")));
         model.put("tableSql", quote(table.getName()));
+        if (Boolean.parseBoolean(settings.getProperty("controller.enabled", "false"))) {
+            model.put("controllerPackage", required(settings, "controller.package"));
+            String entityVariable = Character.toLowerCase(table.getEntityName().charAt(0))
+                    + table.getEntityName().substring(1);
+            model.put("controllerRoute", entityVariable);
+            model.put("controllerIdParam", "id".equals(key.getPropertyName())
+                    ? entityVariable + "Id" : key.getPropertyName());
+            List<TableField> editableFields = table.getFields().stream()
+                    .filter(f -> !f.isKeyFlag() && f != created && f != updated && f != deleted)
+                    .collect(Collectors.toList());
+            model.put("editableFields", editableFields);
+            Set<String> controllerImports = new TreeSet<>();
+            for (TableField editable : editableFields) {
+                String fieldPackage = editable.getColumnType().getPkg();
+                if (fieldPackage != null && !fieldPackage.startsWith("java.lang.")) {
+                    controllerImports.add(fieldPackage);
+                }
+            }
+            model.put("controllerImports", controllerImports);
+            List<String> hiddenFields = Arrays.asList(split(settings.getProperty(
+                    "controller.hidden-fields", "password,passwordHash,salt")));
+            model.put("responseFields", table.getFields().stream()
+                    .filter(f -> f != deleted && !hiddenFields.contains(f.getPropertyName()))
+                    .collect(Collectors.toList()));
+        }
     }
 
     private static TableField field(TableInfo table, String column) {

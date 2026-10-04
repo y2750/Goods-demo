@@ -3,6 +3,7 @@ package com.example.mall.module.service;
 import com.example.mall.module.entity.User;
 import com.example.mall.module.mapper.UserMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.List;
  */
 @Service
 public class UserService {
+    public static final int PAGE_SIZE = 10;
+
     @Resource
     private UserMapper mapper;
 
@@ -63,5 +66,21 @@ public class UserService {
         }
         long timestamp = System.currentTimeMillis() / 1000;
         return mapper.delete(id, (int) timestamp);
+    }
+
+    public List<User> getUsersByPage(Integer page, String keyword) {
+        if (page == null || page <= 0) {
+            throw new IllegalArgumentException("page 必须为正整数");
+        }
+        long offset = (page - 1L) * PAGE_SIZE;
+        return mapper.getUsersByPage(offset, PAGE_SIZE, toUsernamePattern(keyword));
+    }
+
+    public Long getTotal(String keyword) {
+        return mapper.getTotal(toUsernamePattern(keyword));
+    }
+
+    private String toUsernamePattern(String keyword) {
+        return StringUtils.hasText(keyword) ? "%" + keyword.trim() + "%" : null;
     }
 }
