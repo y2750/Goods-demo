@@ -52,29 +52,16 @@
         AND is_deleted = 0
     </update>
 
-    <!-- app：分类 ID 由第一条 SQL 查出，此处是第二条 SQL，没有联表或子查询。 -->
+    <!-- 联表取出分类名；保留原始商品分页，由 app 在计算 isEnd 后过滤无效分类。 -->
     <select id="getAppGoodsByPage" resultType="com.example.mall.module.entity.Goods">
-        SELECT * FROM goods
-        <where>
-            is_deleted = 0
-            <if test="keyword != null and keyword != ''">
-                AND (
-                    title LIKE #{keyword}
-                    <if test="categoryIds != null and categoryIds.size() > 0">
-                        OR category_id IN
-                        <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
-                            #{categoryId}
-                        </foreach>
-                    </if>
-                )
-            </if>
-        </where>
-        ORDER BY id
+        SELECT g.*, c.name AS categoryName
+        <include refid="goodsCategoryFilter"/>
+        ORDER BY g.id
         LIMIT #{offset}, #{pageSize}
     </select>
 
-    <!-- console：列表和总数复用完全相同的联表与筛选条件。 -->
-    <sql id="consoleGoodsFilter">
+    <!-- 两端列表与后台总数复用相同的联表和关键词筛选条件。 -->
+    <sql id="goodsCategoryFilter">
         FROM goods g
         LEFT JOIN category c ON c.id = g.category_id AND c.is_deleted = 0
         <where>
@@ -87,14 +74,14 @@
 
     <select id="getConsoleGoodsByPage" resultType="com.example.mall.module.entity.Goods">
         SELECT g.*, c.name AS categoryName
-        <include refid="consoleGoodsFilter"/>
+        <include refid="goodsCategoryFilter"/>
         ORDER BY g.id
         LIMIT #{offset}, #{pageSize}
     </select>
 
     <select id="getConsoleTotal" resultType="java.lang.Integer">
         SELECT COUNT(*)
-        <include refid="consoleGoodsFilter"/>
+        <include refid="goodsCategoryFilter"/>
     </select>
 
 </mapper>

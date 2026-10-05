@@ -19,7 +19,9 @@ import java.util.List;
  */
 @Mapper
 public interface GoodsMapper {
-    @Select("select * from goods WHERE id=#{id} and is_deleted = 0")
+    @Select("SELECT g.*, c.name AS categoryName, c.image AS categoryImage "
+            + "FROM goods g LEFT JOIN category c ON c.id = g.category_id AND c.is_deleted = 0 "
+            + "WHERE g.id = #{id} AND g.is_deleted = 0")
     Goods getById(@Param("id") Integer id);
 
     @Select("select * from goods where is_deleted = 0")
@@ -34,8 +36,7 @@ public interface GoodsMapper {
 
     List<Goods> getAppGoodsByPage(@Param("offset") int offset,
                                  @Param("pageSize") int pageSize,
-                                 @Param("keyword") String keyword,
-                                 @Param("categoryIds") List<Integer> categoryIds);
+                                 @Param("keyword") String keyword);
 
     List<Goods> getConsoleGoodsByPage(@Param("offset") int offset,
                                      @Param("pageSize") int pageSize,

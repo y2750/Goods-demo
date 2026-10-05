@@ -4,9 +4,7 @@ import com.example.mall.app.exception.GlobalExceptionHandler;
 import com.example.mall.app.domain.GoodsInfoVo;
 import com.example.mall.app.domain.GoodsListFeedVo;
 import com.example.mall.app.domain.GoodsListVo;
-import com.example.mall.module.entity.Category;
 import com.example.mall.module.entity.Goods;
-import com.example.mall.module.service.CategoryService;
 import com.example.mall.module.service.GoodsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +27,6 @@ public class GoodsController {
     @Autowired
     private GoodsService service;
 
-    @Autowired
-    private CategoryService categoryService;
-
     @RequestMapping("/goods/info")
     public GoodsInfoVo goodsInfo(@RequestParam(name = "goodsId") Integer id) {
         try {
@@ -40,15 +35,16 @@ public class GoodsController {
                 exceptionHandler.resolveException(new IllegalArgumentException("商品不存在或已删除：" + id));
                 return null;
             }
-            // 详情必须有有效分类；缺失时由全局异常处理返回错误。
-            Category category = categoryService.getById(goods.getCategoryId());
+            // 分类名为 NOT NULL；联表结果为空表示分类不存在或已删除。
+            if (goods.getCategoryName() == null) {
+                exceptionHandler.resolveException(new IllegalArgumentException("分类不存在或已删除"));
+                return null;
+            }
             GoodsInfoVo vo = new GoodsInfoVo();
             BeanUtils.copyProperties(goods, vo);
             vo.setGoodsId(goods.getId());
             vo.setGoodsImages(goods.getImages() == null ? Collections.emptyList()
                     : Arrays.asList(goods.getImages().split("\\$")));
-            vo.setCategoryName(category.getName());
-            vo.setCategoryImage(category.getImage());
             return vo;
         } catch (Exception e) {
             exceptionHandler.resolveException(e);
@@ -70,9 +66,8 @@ public class GoodsController {
             feed.setIsEnd(goodsList.size() < PAGE_SIZE);
             List<GoodsListVo> list = new ArrayList<>();
             for (Goods goods : goodsList) {
-                // 按要求逐条查分类，不使用联表查询。
-                Category category = categoryService.findById(goods.getCategoryId());
-                if (category == null) {
+                // 分类信息已由联表查询取出，不再逐条查询分类。
+                if (goods.getCategoryName() == null) {
                     continue;
                 }
                 GoodsListVo vo = new GoodsListVo();
@@ -80,7 +75,6 @@ public class GoodsController {
                 vo.setGoodsId(goods.getId());
                 String images = goods.getImages();
                 vo.setMainImage(images == null ? "" : images.split("\\$", -1)[0]);
-                vo.setCategoryName(category.getName());
                 list.add(vo);
             }
             feed.setList(list);

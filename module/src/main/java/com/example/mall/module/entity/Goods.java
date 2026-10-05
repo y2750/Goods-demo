@@ -23,6 +23,8 @@ public class Goods {
     private Integer categoryId;
     /** 联表查询返回的分类名，不参与商品新增和更新。 */
     private String categoryName;
+    /** 联表查询返回的分类图，不参与商品新增和更新。 */
+    private String categoryImage;
     private String title;
     private String images;
     private Float price;

@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -78,11 +77,7 @@ public class GoodsService {
 
     public List<Goods> getAppGoodsByPage(Integer page, String keyword) {
         int offset = (page - 1) * PAGE_SIZE;
-        String pattern = toKeywordPattern(keyword);
-        // 把分类子查询拆开：先查分类 ID，再用标题 OR 分类 ID 查询商品并分页。
-        List<Integer> categoryIds = pattern == null ? Collections.emptyList()
-                : categoryService.getIdsByName(pattern);
-        return mapper.getAppGoodsByPage(offset, PAGE_SIZE, pattern, categoryIds);
+        return mapper.getAppGoodsByPage(offset, PAGE_SIZE, toKeywordPattern(keyword));
     }
 
     public List<Goods> getConsoleGoodsByPage(Integer page, String keyword) {

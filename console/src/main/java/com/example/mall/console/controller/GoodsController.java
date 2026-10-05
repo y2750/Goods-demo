@@ -11,9 +11,7 @@ import java.util.List;
 import com.example.mall.console.domain.GoodsInfoVo;
 import com.example.mall.console.domain.GoodsListFeedVo;
 import com.example.mall.console.domain.GoodsListVo;
-import com.example.mall.module.entity.Category;
 import com.example.mall.module.entity.Goods;
-import com.example.mall.module.service.CategoryService;
 import com.example.mall.module.service.GoodsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +38,6 @@ public class GoodsController {
 
     @Autowired
     private GoodsService service;
-
-    @Autowired
-    private CategoryService categoryService;
 
     @RequestMapping("/goods/create")
     public Integer goodsCreate(
@@ -107,11 +102,6 @@ public class GoodsController {
             List<String> list = Arrays.asList(goods.getImages().split("\\$"));
             goodsInfoVO.setGoodsImages(list);
             goodsInfoVO.setGoodsId(goods.getId());
-            Category category = categoryService.findById(goods.getCategoryId());
-            if (category != null) {
-                goodsInfoVO.setCategoryName(category.getName());
-                goodsInfoVO.setCategoryImage(category.getImage());
-            }
             goodsInfoVO.setCreateTime(Instant.ofEpochSecond(goods.getCreateTime())
                     .atZone(ZoneId.of("Asia/Shanghai"))
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
