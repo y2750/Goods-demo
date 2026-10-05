@@ -1,9 +1,12 @@
 package com.example.mall.app.controller;
 
+import com.example.mall.app.exception.GlobalExceptionHandler;
+import com.example.mall.app.domain.GoodsInfoVo;
 import com.example.mall.app.domain.GoodsListFeedVo;
 import com.example.mall.app.domain.GoodsListVo;
-import com.example.mall.app.domain.GoodsInfoVo;
+import com.example.mall.module.entity.Category;
 import com.example.mall.module.entity.Goods;
+import com.example.mall.module.service.CategoryService;
 import com.example.mall.module.service.GoodsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,51 +16,78 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.mall.module.service.GoodsService.PAGE_SIZE;
 
-/**
- * ClassName: GoodsController
- * Package: com.example.mall.app.controller
- * Description:
- *
- * @Author
- * @Create 2026/9/26 14:51
- * @Version 1.0
- */
 @RestController
 public class GoodsController {
     @Autowired
+    private GlobalExceptionHandler exceptionHandler;
+
+    @Autowired
     private GoodsService service;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @RequestMapping("/goods/info")
     public GoodsInfoVo goodsInfo(@RequestParam(name = "goodsId") Integer id) {
-        Goods goods = service.getGoodsInfoById(id);
-        GoodsInfoVo goodsInfoVO = new GoodsInfoVo();
-        BeanUtils.copyProperties(goods, goodsInfoVO, "price");
-        goodsInfoVO.setPrice(goods.getPrice().floatValue());
-        List<String> list = Arrays.asList(goods.getImages().split("\\$"));
-        goodsInfoVO.setGoodsImages(list);
-        goodsInfoVO.setGoodsId(goods.getId());
-        return goodsInfoVO;
+        try {
+            Goods goods = service.getGoodsInfoById(id);
+            if (goods == null) {
+                exceptionHandler.resolveException(new IllegalArgumentException("商品不存在或已删除：" + id));
+                return null;
+            }
+            // 详情必须有有效分类；缺失时由全局异常处理返回错误。
+            Category category = categoryService.getById(goods.getCategoryId());
+            GoodsInfoVo vo = new GoodsInfoVo();
+            BeanUtils.copyProperties(goods, vo);
+            vo.setGoodsId(goods.getId());
+            vo.setGoodsImages(goods.getImages() == null ? Collections.emptyList()
+                    : Arrays.asList(goods.getImages().split("\\$")));
+            vo.setCategoryName(category.getName());
+            vo.setCategoryImage(category.getImage());
+            return vo;
+        } catch (Exception e) {
+            exceptionHandler.resolveException(e);
+            return null;
+        }
     }
 
     @RequestMapping("/goods/list")
-    public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page, @RequestParam(name = "keyword", required = false) String keyword) {
-        GoodsListFeedVo goodsListFeedVo = new GoodsListFeedVo();
-        List<Goods> goodsList = service.getGoodsByPage(page,keyword);
-        goodsListFeedVo.setIsEnd(!(goodsList.size() == PAGE_SIZE));
-        List<GoodsListVo> goodsListVOList = new ArrayList<>();
-        for (Goods goods : goodsList) {
-            GoodsListVo goodsListVO = new GoodsListVo();
-            BeanUtils.copyProperties(goods, goodsListVO, "price");
-            goodsListVO.setPrice(goods.getPrice().floatValue());
-            goodsListVO.setMainImage(goods.getImages().split("\\$")[0]);
-            goodsListVO.setGoodsId(goods.getId());
-            goodsListVOList.add(goodsListVO);
+    public GoodsListFeedVo goodsList(@RequestParam(name = "page") Integer page,
+                                    @RequestParam(name = "keyword", required = false) String keyword) {
+        try {
+            if (page <= 0) {
+                exceptionHandler.resolveException(new IllegalArgumentException("page 必须为正整数"));
+                return null;
+            }
+            List<Goods> goodsList = service.getAppGoodsByPage(page, keyword);
+            GoodsListFeedVo feed = new GoodsListFeedVo();
+            // 沿用原始分页规则，先判断 isEnd，不能用过滤后的列表长度判断。
+            feed.setIsEnd(goodsList.size() < PAGE_SIZE);
+            List<GoodsListVo> list = new ArrayList<>();
+            for (Goods goods : goodsList) {
+                // 按要求逐条查分类，不使用联表查询。
+                Category category = categoryService.findById(goods.getCategoryId());
+                if (category == null) {
+                    continue;
+                }
+                GoodsListVo vo = new GoodsListVo();
+                BeanUtils.copyProperties(goods, vo);
+                vo.setGoodsId(goods.getId());
+                String images = goods.getImages();
+                vo.setMainImage(images == null ? "" : images.split("\\$", -1)[0]);
+                vo.setCategoryName(category.getName());
+                list.add(vo);
+            }
+            feed.setList(list);
+            return feed;
+        } catch (Exception e) {
+            exceptionHandler.resolveException(e);
+            return null;
         }
-        goodsListFeedVo.setList(goodsListVOList);
-        return goodsListFeedVo;
     }
 }

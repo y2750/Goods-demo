@@ -7,6 +7,7 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="goods.id">
         INSERT INTO goods(
+        category_id,
         <if test="goods.title != null and goods.title != ''">title,</if>
         <if test="goods.images != null and goods.images != ''">images,</if>
         <if test="goods.price != null">price,</if>
@@ -16,6 +17,7 @@
         is_deleted
         )
         VALUES(
+        #{goods.categoryId},
         <if test="goods.title != null and goods.title != ''">#{goods.title},</if>
         <if test="goods.images != null and goods.images != ''">#{goods.images},</if>
         <if test="goods.price != null">#{goods.price},</if>
@@ -29,6 +31,9 @@
     <update id="update">
         UPDATE goods
         <set>
+            <if test="goods.categoryId != null">
+                category_id = #{goods.categoryId},
+            </if>
             <if test="goods.title != null and goods.title != ''">
                 title = #{goods.title},
             </if>
@@ -47,26 +52,49 @@
         AND is_deleted = 0
     </update>
 
-    <select id="getGoodsByPage" resultType="com.example.mall.module.entity.Goods">
+    <!-- app：分类 ID 由第一条 SQL 查出，此处是第二条 SQL，没有联表或子查询。 -->
+    <select id="getAppGoodsByPage" resultType="com.example.mall.module.entity.Goods">
         SELECT * FROM goods
         <where>
             is_deleted = 0
             <if test="keyword != null and keyword != ''">
-                AND title LIKE #{keyword}
+                AND (
+                    title LIKE #{keyword}
+                    <if test="categoryIds != null and categoryIds.size() > 0">
+                        OR category_id IN
+                        <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+                            #{categoryId}
+                        </foreach>
+                    </if>
+                )
             </if>
         </where>
         ORDER BY id
         LIMIT #{offset}, #{pageSize}
     </select>
 
-    <select id="getTotal" resultType="java.lang.Integer">
-        SELECT count(*) FROM goods
+    <!-- console：列表和总数复用完全相同的联表与筛选条件。 -->
+    <sql id="consoleGoodsFilter">
+        FROM goods g
+        LEFT JOIN category c ON c.id = g.category_id AND c.is_deleted = 0
         <where>
-            is_deleted = 0
+            g.is_deleted = 0
             <if test="keyword != null and keyword != ''">
-                AND title LIKE #{keyword}
+                AND (g.title LIKE #{keyword} OR c.name LIKE #{keyword})
             </if>
         </where>
+    </sql>
+
+    <select id="getConsoleGoodsByPage" resultType="com.example.mall.module.entity.Goods">
+        SELECT g.*, c.name AS categoryName
+        <include refid="consoleGoodsFilter"/>
+        ORDER BY g.id
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="getConsoleTotal" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        <include refid="consoleGoodsFilter"/>
     </select>
 
 </mapper>

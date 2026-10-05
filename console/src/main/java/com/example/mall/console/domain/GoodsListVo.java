@@ -16,6 +16,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class GoodsListVo {
     private Integer goodsId;
+    private String categoryName;
     private String title;
     private String mainImage;
     private float price;

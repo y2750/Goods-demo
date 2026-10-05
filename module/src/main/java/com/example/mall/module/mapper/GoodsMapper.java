@@ -32,9 +32,19 @@ public interface GoodsMapper {
     @Update("update goods set is_deleted=1, update_time=#{time} where id=#{id} limit 1")
     int delete(@Param("id") Integer id, @Param("time") Integer time);
 
-    List<Goods> getGoodsByPage(@Param("offset") int offset,@Param("pageSize") int pageSize,@Param("keyword") String keyword);
+    List<Goods> getAppGoodsByPage(@Param("offset") int offset,
+                                 @Param("pageSize") int pageSize,
+                                 @Param("keyword") String keyword,
+                                 @Param("categoryIds") List<Integer> categoryIds);
 
-    Integer getTotal(@Param("keyword") String keyword);
+    List<Goods> getConsoleGoodsByPage(@Param("offset") int offset,
+                                     @Param("pageSize") int pageSize,
+                                     @Param("keyword") String keyword);
+
+    Integer getConsoleTotal(@Param("keyword") String keyword);
+
+    @Select("SELECT COUNT(*) FROM goods WHERE category_id = #{categoryId} AND is_deleted = 0")
+    Integer countByCategoryId(@Param("categoryId") Integer categoryId);
 
     @Select("select * from goods WHERE id=#{id}")
     Goods extractById(Integer id);

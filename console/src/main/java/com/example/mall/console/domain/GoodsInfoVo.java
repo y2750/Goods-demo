@@ -18,6 +18,8 @@ import java.util.List;
 @Accessors(chain = true)
 public class GoodsInfoVo {
     private Integer goodsId;
+    private String categoryName;
+    private String categoryImage;
     private String title;
     private List<String> goodsImages;
     private float price;
